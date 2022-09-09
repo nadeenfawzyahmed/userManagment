@@ -1,25 +1,15 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import { useEffect, useState } from "react";
+import { fetchUsers}  from '../store/users/user.actions';
+import { useDispatch, useSelector, connect } from "react-redux";
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'firstName', headerName: 'First name', width: 130 },
-  { field: 'lastName', headerName: 'Last name', width: 130 },
-  {
-    field: 'age',
-    headerName: 'Age',
-    type: 'number',
-    width: 90,
-  },
-  {
-    field: 'fullName',
-    headerName: 'Full name',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params) =>
-      `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-  },
+  { field: 'id', headerName: 'ID', width: 220 },
+  { field: 'title', headerName: 'Title', width: 130 },
+  { field: 'firstName', headerName: 'First Name', width: 130 },
+  { field: 'lastName',headerName: 'Last Name',type: 'number',width: 130, },
+ 
 ];
 
 const rows = [
@@ -35,10 +25,26 @@ const rows = [
 ];
 
 export default function DataTable() {
+  const dispatch = useDispatch();
+  const users = useSelector(({ users }) => users.data);
+  const isFetching = useSelector(({ users }) => users.isFetching);
+  const errorMessage = useSelector(({ users }) => users.errorMessage);
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+  if (errorMessage) return errorMessage;
+
+ // if (isFetching) return <Loader />;
+  if (users.length !== 0) {
+    console.log(users);
+    console.log("done");
+
+
+
   return (
     <div style={{ height: 600, width: '100%' }}>
       <DataGrid
-        rows={rows}
+        rows={users}
         columns={columns}
         pageSize={8}
         rowsPerPageOptions={[5]}
@@ -46,4 +52,4 @@ export default function DataTable() {
       />
     </div>
   );
-}
+}}
